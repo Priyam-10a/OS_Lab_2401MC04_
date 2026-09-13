@@ -1,0 +1,79 @@
+SYNCHRONIZATION AND DEADLOCK AVOIDANCE — EXPLANATION
+
+This program is a multi-resource synchronization example based on the idea of
+Dining Philosophers.
+
+Instead of philosophers and forks, the program uses three shared resource
+types:
+
+    Printer
+    Scanner
+    Disk
+
+The resource pools have limited instances. For example:
+
+    Printers = 2
+    Scanners = 1
+    Disks = 2
+
+Five processes are created using fork(). Each process represents a worker that
+needs two resources to perform some work.
+
+Since multiple processes can try to use the same resource at the same time,
+locks/semaphores are used to protect the resource counts. A process cannot
+take a resource if no instance of that resource is currently available.
+
+The program follows a resource-ordering strategy to avoid deadlock.
+
+A fixed order is assigned to the resources, for example:
+
+    Printer -> Scanner -> Disk
+
+Whenever a process needs two resources, it requests them according to this
+order rather than choosing an arbitrary order.
+
+For example, if a process needs a Printer and a Disk, it first gets the
+Printer and then the Disk.
+
+This is important because deadlock can occur when different processes hold
+different resources and wait for one another. By forcing every process to
+follow the same resource order, a circular waiting chain cannot be formed.
+
+Each process repeatedly performs the following steps:
+
+1. Request the resources it needs.
+2. Wait if the required resource instance is not available.
+3. Acquire the resources in the predefined order.
+4. Print messages showing which resources were granted.
+5. Perform some simulated work using sleep() or a busy-wait.
+6. Release all the resources.
+7. Repeat for the required number of cycles.
+
+The program prints messages for the important events, such as:
+
+    Process requesting Printer
+    Process granted Printer
+    Process requesting Scanner
+    Process granted Scanner
+    Process started working
+    Process released resources
+    Process completed a cycle
+
+These messages help us verify that the resources are being shared correctly.
+
+The resource counts are also protected so that the number of resources in use
+never becomes greater than the number of available instances.
+
+The main reason this program does not deadlock is the consistent resource
+ordering. Every process follows the same order while acquiring resources.
+Therefore, a circular wait cannot be created.
+
+In simple words:
+
+    Different order -> possible circular wait -> possible deadlock
+    Same order     -> no circular wait -> deadlock prevented
+
+The program therefore demonstrates both parts of the problem:
+
+1. Correct synchronization so that shared resources are accessed safely.
+2. Deadlock prevention using a fixed resource-acquisition order.

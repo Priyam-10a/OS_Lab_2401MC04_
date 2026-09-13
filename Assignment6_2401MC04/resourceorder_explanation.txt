@@ -1,0 +1,61 @@
+RESOURCE ORDERING — EXPLANATION
+
+The purpose of this program is to demonstrate how deadlock can happen when
+processes acquire shared resources in different orders, and how resource
+ordering can prevent that deadlock.
+
+In the first part, there are two shared locks: Lock1 and Lock2.
+
+Two child processes are created using fork().
+
+Process A:
+1. Acquires Lock1.
+2. Waits for a short time.
+3. Tries to acquire Lock2.
+
+Process B:
+1. Acquires Lock2.
+2. Waits for a short time.
+3. Tries to acquire Lock1.
+
+The delay is intentional. It gives both processes enough time to acquire one
+lock before trying to acquire the other one.
+
+Now the deadlock situation can occur:
+
+    Process A -> holds Lock1 -> waits for Lock2
+    Process B -> holds Lock2 -> waits for Lock1
+
+Process A cannot continue until Process B releases Lock2, but Process B cannot
+continue until Process A releases Lock1. Therefore, both processes remain
+blocked and the program hangs.
+
+This is a circular wait, which is one of the necessary conditions for
+deadlock.
+
+In the second part, the same problem is solved using resource ordering.
+
+A fixed global order is defined:
+
+    Lock1 -> Lock2
+
+Both processes must always acquire Lock1 before Lock2.
+
+Therefore, the situation where one process holds Lock1 while another holds
+Lock2 cannot be created. If a process cannot get the next lock, it waits
+without creating a circular chain of processes waiting for each other.
+
+For example, if Process A gets Lock1 first, Process B has to wait for Lock1.
+Process A can then acquire Lock2, finish its work, and release both locks.
+After that Process B gets Lock1 and then Lock2 and completes its work.
+
+So, the important idea is:
+
+    ALWAYS ACQUIRE RESOURCES IN THE SAME GLOBAL ORDER.
+
+This breaks the circular-wait condition and therefore prevents the deadlock.
+
+The program prints messages whenever a process acquires a lock, waits for a
+lock, starts its work, and releases its locks. These messages make the
+deadlock in the first case and successful completion in the second case easy
+to observe.
